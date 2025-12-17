@@ -13,7 +13,14 @@ function check_argument($arg_name) {
 }
 
 function get_hosts_by_name($conn, $firstname, $lastname) {
-  $statement = $conn->prepare("SELECT Id, FirstName, LastName FROM Hosts WHERE FirstName LIKE :firstname AND LastName LIKE :lastname");
+    $statement = $conn->prepare("
+    SELECT 
+        Id AS \"Id\", 
+        FirstName AS \"FirstName\", 
+        LastName AS \"LastName\" 
+    FROM Hosts 
+    WHERE FirstName LIKE :firstname AND LastName LIKE :lastname
+    ");
   $statement->bindParam(':firstname', $firstname);
   $statement->bindParam(':lastname', $lastname);
   $statement->execute();
