@@ -1,15 +1,24 @@
 <?php
 function connect() {
-    require_once 'dbconfig.php';
+    // 1. Obtenir la DATABASE_URL de l'entorn
+    $databaseUrl = getenv('DATABASE_URL');
     
-    // PostgreSQL usa un DSN diferent
-    $dsn = "pgsql:host={$dbconfig['server']};dbname={$dbconfig['db']}";
+    if (!$databaseUrl) {
+        // Per a entorn local de desenvolupament (fallback)
+        $databaseUrl = "postgresql://postgres:postgres@localhost:5432/hotel";
+    }
     
-    $conn = new PDO($dsn, $dbconfig['username'], $dbconfig['password']);
+    // 2. Convertir la URL de Render al format que espera PDO
+    // Render dóna: "postgresql://usuari:password@host:5432/db"
+    // PDO espera:  "pgsql:host=host;port=5432;dbname=db;user=usuari;password=password"
+    
+    // Substituir el prefixe
+    $dsn = str_replace('postgresql://', 'pgsql:', $databaseUrl);
+    
+    // 3. Crear la connexió PDO (Atenció: NO passar user/password com a segon i tercer argument)
+    $conn = new PDO($dsn);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     
     return $conn;
 }
 ?>
-
