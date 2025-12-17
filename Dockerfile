@@ -1,20 +1,20 @@
 FROM php:8.2-apache
 
-# Instal·lar extensions PHP
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# Instal·lar extensions PostgreSQL
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql
 
-# Instal·lar i configurar SQLite com a BD alternativa
-RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
-
-# Crear directori per a la BD SQLite
-RUN mkdir -p /var/www/data && chown www-data:www-data /var/www/data
-
-# Copiar el codi
-COPY html/ /var/www/html/
-
-# Permetre .htaccess
+# Habilitar mod_rewrite per a URLs amigables
 RUN a2enmod rewrite
 
-# Exposar port
+# Copiar aplicació
+COPY html/ /var/www/html/
+
+# Permisos
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Exposar port 80
 EXPOSE 80
 
